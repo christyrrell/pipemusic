@@ -3,7 +3,7 @@
 Build browse.json — a structured index of all PDFs organized by collection/book
 for the browse feature of the Ceol Sean Pipe Music Library.
 
-Walks ceolsean.net/content/ to find ALL PDFs (not just indexed ones),
+Walks library/content/ to find ALL PDFs (not just indexed ones),
 groups them by collection directory and book directory, natural-sorts
 filenames, and maps tune information from index.json.
 """
@@ -31,7 +31,7 @@ def natural_sort_key(s):
 
 def main():
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    content_dir = os.path.join(base_dir, 'ceolsean.net', 'content')
+    content_dir = os.path.join(base_dir, 'library', 'content')
     index_path = os.path.join(base_dir, 'index.json')
     output_path = os.path.join(base_dir, 'browse.json')
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Crop headers and footers from ~4,700 scanned music PDFs under ceolsean.net/content/.
+Crop headers and footers from ~4,700 scanned music PDFs under library/content/.
 
 Header: top ~75 pts of the rendered/visible page (contains "Return to Index" link).
 Footer: bottom ~55 pts of the rendered/visible page (contains descriptive text).
@@ -22,7 +22,7 @@ import fitz  # PyMuPDF
 HEADER_PTS = 75   # points to remove from the visual top
 FOOTER_PTS = 55   # points to remove from the visual bottom
 CONTENT_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                            "ceolsean.net", "content")
+                            "library", "content")
 
 
 def get_crop_and_redact_rects(page):

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-OCR all PDFs under ceolsean.net/content/ to extract tune titles from scanned bagpipe sheet music.
+OCR all PDFs under library/content/ to extract tune titles from scanned bagpipe sheet music.
 
 Outputs:
   - ocr_results.json: raw OCR text and detected titles per PDF
@@ -60,7 +60,7 @@ import io
 # ---------------------------------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parent
-CONTENT_DIR = BASE_DIR / "ceolsean.net" / "content"
+CONTENT_DIR = BASE_DIR / "library" / "content"
 INDEX_PATH = BASE_DIR / "index.json"
 OCR_RESULTS_PATH = BASE_DIR / "ocr_results.json"
 DPI = 150

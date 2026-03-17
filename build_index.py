@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Parse all HTML metadata from ceolsean.net into a single JSON index file.
+Parse all HTML metadata from library into a single JSON index file.
 
 Sources:
 1. Master Index pages (mindex1-5.html) - base tune data
@@ -17,20 +17,20 @@ from urllib.parse import unquote
 from collections import defaultdict
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SITE_DIR = os.path.join(BASE_DIR, "ceolsean.net")
+SITE_DIR = os.path.join(BASE_DIR, "library")
 CONTENT_DIR = os.path.join(SITE_DIR, "content")
 
 # URL prefixes to strip
 URL_PREFIXES = [
-    "https://ceolsean.net/",
-    "https://www.ceolsean.net/",
-    "http://ceolsean.net/",
-    "http://www.ceolsean.net/",
+    "https://library/",
+    "https://www.library/",
+    "http://library/",
+    "http://www.library/",
 ]
 
 
 def normalize_pdf_path(href):
-    """Convert an href to a local relative path under ceolsean.net/."""
+    """Convert an href to a local relative path under library/."""
     if not href:
         return None
     href = href.strip()
@@ -615,7 +615,7 @@ def build_index():
 
 
 def main():
-    print("Building ceolsean.net index...")
+    print("Building library index...")
     print()
 
     index = build_index()

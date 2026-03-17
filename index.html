@@ -684,7 +684,7 @@ function showMore() {
 function createResultElement(t) {
   const a = document.createElement('a');
   a.className = 'result-item';
-  a.href = 'ceolsean.net/' + t.pdf;
+  a.href = 'library/' + t.pdf;
   a.target = '_blank';
   a.rel = 'noopener';
 
@@ -817,7 +817,7 @@ function showBookPage() {
   }
 
   // Update PDF embed
-  const pdfUrl = 'ceolsean.net/' + page.file;
+  const pdfUrl = 'library/' + page.file;
   pdfContainer.innerHTML = `<embed src="${encodeURI(pdfUrl)}" type="application/pdf">`;
 }
 
