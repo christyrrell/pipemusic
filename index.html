@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ceol Sean Pipe Music Library</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #f8f7f4;
+  color: #2c2c2c;
+  line-height: 1.5;
+}
+
+header {
+  background: #1a3a2a;
+  color: #e8e4d8;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+header h1 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+header p {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin-top: 0.25rem;
+}
+
+/* Mode tabs */
+.mode-tabs {
+  display: flex;
+  gap: 0;
+  margin-top: 0.75rem;
+}
+
+.mode-tab {
+  padding: 0.4rem 1.2rem;
+  font-size: 0.9rem;
+  background: rgba(255,255,255,0.1);
+  color: #e8e4d8;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.mode-tab:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.mode-tab.active {
+  background: #f8f7f4;
+  color: #1a3a2a;
+  font-weight: 600;
+  border-color: #f8f7f4;
+}
+
+/* Search mode */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.search-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #f8f7f4;
+  padding: 1rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1.1rem;
+  border: 2px solid #c5c0b0;
+  border-radius: 8px;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-bar input:focus {
+  border-color: #1a3a2a;
+}
+
+.filters {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filters select {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+  border: 1px solid #c5c0b0;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.filters .stats {
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.results {
+  margin-top: 1rem;
+}
+
+.result-item {
+  background: #fff;
+  border: 1px solid #e0ddd4;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.result-item:hover {
+  border-color: #1a3a2a;
+  box-shadow: 0 2px 6px rgba(26,58,42,0.1);
+}
+
+.result-item .tune-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #1a3a2a;
+}
+
+.result-item .tune-meta {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.2rem;
+}
+
+.result-item .tune-meta span {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+.result-item .tune-meta .tag {
+  background: #e8e4d8;
+  color: #555;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.result-item .alt-titles {
+  font-size: 0.8rem;
+  color: #888;
+  font-style: italic;
+  margin-top: 0.15rem;
+}
+
+.result-item .extra-tunes {
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid #f0ede6;
+}
+
+.result-item .extra-tunes .tune-name {
+  font-size: 0.95rem;
+}
+
+.no-results {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #999;
+  font-size: 1.1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #999;
+}
+
+#load-more {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  background: #e8e4d8;
+  border: 1px solid #c5c0b0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  color: #555;
+}
+
+#load-more:hover {
+  background: #ddd8c8;
+}
+
+/* Browse mode */
+#browse-view {
+  display: none;
+  height: calc(100vh - 80px);
+}
+
+#browse-view.active {
+  display: flex;
+}
+
+#search-view {
+  display: none;
+}
+
+#search-view.active {
+  display: block;
+}
+
+.browse-sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: #fff;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.browse-sidebar .sidebar-header {
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #eee;
+}
+
+.collection-item {
+  border-bottom: 1px solid #f0ede6;
+}
+
+.collection-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a3a2a;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.1s;
+}
+
+.collection-toggle:hover {
+  background: #f0ede6;
+}
+
+.collection-toggle .arrow {
+  font-size: 0.7rem;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  width: 1em;
+}
+
+.collection-toggle.open .arrow {
+  transform: rotate(90deg);
+}
+
+.collection-toggle .coll-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collection-toggle .book-count {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.book-list {
+  display: none;
+  padding: 0 0 0.25rem 0;
+}
+
+.book-list.open {
+  display: block;
+}
+
+.book-item {
+  display: block;
+  width: 100%;
+  padding: 0.35rem 1rem 0.35rem 2.2rem;
+  font-size: 0.85rem;
+  color: #555;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.1s, color 0.1s;
+}
+
+.book-item:hover {
+  background: #f0ede6;
+  color: #1a3a2a;
+}
+
+.book-item.active {
+  background: #1a3a2a;
+  color: #e8e4d8;
+  font-weight: 600;
+}
+
+.book-item .page-count {
+  font-weight: 400;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* Book viewer */
+.browse-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: #eae7e0;
+}
+
+.viewer-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+.viewer-toolbar .book-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1a3a2a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.viewer-toolbar .spacer {
+  flex: 1;
+}
+
+.nav-btn {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.9rem;
+  background: #e8e4d8;
+  border: 1px solid #c5c0b0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  color: #555;
+  transition: background 0.1s;
+  flex-shrink: 0;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: #ddd8c8;
+}
+
+.nav-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.page-indicator {
+  font-size: 0.9rem;
+  color: #666;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.viewer-tune-info {
+  padding: 0.4rem 1rem;
+  background: #f8f7f4;
+  border-bottom: 1px solid #eee;
+  font-size: 0.88rem;
+  flex-shrink: 0;
+  min-height: 1.8rem;
+}
+
+.viewer-tune-info .tune-label {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.viewer-tune-info .tune-names {
+  color: #1a3a2a;
+  font-weight: 500;
+}
+
+.viewer-pdf-container {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 0;
+  min-height: 0;
+}
+
+.viewer-pdf-container embed {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.viewer-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: #999;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.viewer-empty .hint {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  opacity: 0.7;
+}
+
+/* Resize handle */
+.resize-handle {
+  width: 4px;
+  cursor: col-resize;
+  background: #ddd;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.resize-handle:hover,
+.resize-handle.dragging {
+  background: #1a3a2a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .browse-sidebar {
+    width: 220px;
+    min-width: 220px;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ceol Sean Pipe Music Library</h1>
+  <p>Search over 7,000 settings across 39 collections</p>
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-mode="search">Search</button>
+    <button class="mode-tab" data-mode="browse">Browse</button>
+  </div>
+</header>
+
+<div class="container" id="search-view">
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Search tune names, composers, Gaelic titles..." autofocus>
+    <div class="filters">
+      <select id="filter-type"><option value="">All tune types</option></select>
+      <select id="filter-collection"><option value="">All collections</option></select>
+      <span class="stats" id="stats"></span>
+    </div>
+  </div>
+  <div class="results" id="results">
+    <div class="loading">Loading index...</div>
+  </div>
+</div>
+
+<div id="browse-view">
+  <div class="browse-sidebar" id="browse-sidebar">
+    <div class="sidebar-header">Collections</div>
+    <div id="collection-list"></div>
+  </div>
+  <div class="resize-handle" id="resize-handle"></div>
+  <div class="browse-main">
+    <div class="viewer-toolbar" id="viewer-toolbar" style="display:none;">
+      <span class="book-title" id="viewer-book-title"></span>
+      <span class="spacer"></span>
+      <button class="nav-btn" id="btn-prev" title="Previous page (Left arrow)">&larr; Prev</button>
+      <span class="page-indicator" id="page-indicator"></span>
+      <button class="nav-btn" id="btn-next" title="Next page (Right arrow)">Next &rarr;</button>
+    </div>
+    <div class="viewer-tune-info" id="viewer-tune-info" style="display:none;"></div>
+    <div class="viewer-pdf-container" id="viewer-pdf-container">
+      <div class="viewer-empty">
+        <div>
+          Select a collection and book from the sidebar to start browsing.
+          <div class="hint">Use left/right arrow keys or the buttons to turn pages.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== SEARCH MODE =====================
+let INDEX = [];
+let FLAT = [];
+let PAGE_SIZE = 100;
+
+async function init() {
+  const resp = await fetch('index.json');
+  INDEX = await resp.json();
+
+  for (const entry of INDEX) {
+    for (const tune of entry.tunes) {
+      FLAT.push({
+        name: tune.name,
+        nameLower: tune.name.toLowerCase(),
+        type: tune.type || '',
+        typeLower: (tune.type || '').toLowerCase(),
+        composer: tune.composer || '',
+        composerLower: (tune.composer || '').toLowerCase(),
+        gaelic: tune.gaelic || '',
+        gaelicLower: (tune.gaelic || '').toLowerCase(),
+        altTitles: tune.alt_titles || [],
+        altLower: (tune.alt_titles || []).map(a => a.toLowerCase()),
+        pdf: entry.pdf,
+        collection: entry.collection,
+        collectionShort: entry.collection_short,
+        collectionLower: (entry.collection_short || '').toLowerCase(),
+        book: entry.book || '',
+        otherTunes: entry.tunes.length > 1
+          ? entry.tunes.filter(t => t !== tune).map(t => t.name)
+          : []
+      });
+    }
+  }
+
+  FLAT.sort((a, b) => a.nameLower.localeCompare(b.nameLower));
+  populateFilters();
+  render();
+
+  document.getElementById('search').addEventListener('input', debounce(render, 150));
+  document.getElementById('filter-type').addEventListener('change', render);
+  document.getElementById('filter-collection').addEventListener('change', render);
+}
+
+function populateFilters() {
+  const typeSet = new Set();
+  const collSet = new Set();
+  for (const t of FLAT) {
+    if (t.type) typeSet.add(t.type);
+    if (t.collectionShort) collSet.add(t.collectionShort);
+  }
+
+  const typeSelect = document.getElementById('filter-type');
+  for (const t of [...typeSet].sort()) {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t;
+    typeSelect.appendChild(opt);
+  }
+
+  const collSelect = document.getElementById('filter-collection');
+  for (const c of [...collSet].sort()) {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    collSelect.appendChild(opt);
+  }
+}
+
+function searchTunes(query, typeFilter, collFilter) {
+  let results = FLAT;
+
+  if (collFilter) {
+    results = results.filter(t => t.collectionShort === collFilter);
+  }
+  if (typeFilter) {
+    results = results.filter(t => t.type === typeFilter);
+  }
+
+  if (query) {
+    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+    results = results.filter(t => {
+      return terms.every(term => {
+        return t.nameLower.includes(term)
+          || t.composerLower.includes(term)
+          || t.gaelicLower.includes(term)
+          || t.collectionLower.includes(term)
+          || t.altLower.some(a => a.includes(term));
+      });
+    });
+
+    results = results.map(t => {
+      let score = 0;
+      const q = query.toLowerCase();
+      if (t.nameLower === q) score = 100;
+      else if (t.nameLower.startsWith(q)) score = 80;
+      else if (t.nameLower.includes(q)) score = 60;
+      else if (t.altLower.some(a => a.includes(q))) score = 40;
+      else score = 20;
+      return { ...t, score };
+    });
+    results.sort((a, b) => b.score - a.score || a.nameLower.localeCompare(b.nameLower));
+  }
+
+  return results;
+}
+
+let currentResults = [];
+let shownCount = 0;
+
+function render() {
+  const query = document.getElementById('search').value.trim();
+  const typeFilter = document.getElementById('filter-type').value;
+  const collFilter = document.getElementById('filter-collection').value;
+
+  currentResults = searchTunes(query, typeFilter, collFilter);
+  shownCount = 0;
+
+  const container = document.getElementById('results');
+  container.innerHTML = '';
+
+  document.getElementById('stats').textContent =
+    `${currentResults.length.toLocaleString()} setting${currentResults.length !== 1 ? 's' : ''} found`;
+
+  if (currentResults.length === 0) {
+    container.innerHTML = '<div class="no-results">No settings found</div>';
+    return;
+  }
+
+  showMore();
+}
+
+function showMore() {
+  const container = document.getElementById('results');
+  const existing = document.getElementById('load-more');
+  if (existing) existing.remove();
+
+  const end = Math.min(shownCount + PAGE_SIZE, currentResults.length);
+
+  for (let i = shownCount; i < end; i++) {
+    const t = currentResults[i];
+    container.appendChild(createResultElement(t));
+  }
+
+  shownCount = end;
+
+  if (shownCount < currentResults.length) {
+    const btn = document.createElement('button');
+    btn.id = 'load-more';
+    btn.textContent = `Show more (${(currentResults.length - shownCount).toLocaleString()} remaining)`;
+    btn.addEventListener('click', showMore);
+    container.appendChild(btn);
+  }
+}
+
+function createResultElement(t) {
+  const a = document.createElement('a');
+  a.className = 'result-item';
+  a.href = 'ceolsean.net/' + t.pdf;
+  a.target = '_blank';
+  a.rel = 'noopener';
+
+  let html = `<div class="tune-name">${esc(t.name)}</div>`;
+  html += '<div class="tune-meta">';
+  if (t.type) html += `<span class="tag">${esc(t.type)}</span>`;
+  html += `<span>${esc(t.collectionShort)}</span>`;
+  if (t.composer) html += `<span>by ${esc(t.composer)}</span>`;
+  if (t.book) html += `<span>${esc(t.book)}</span>`;
+  html += '</div>';
+
+  if (t.gaelic) {
+    html += `<div class="alt-titles">Gaelic: ${esc(t.gaelic)}</div>`;
+  }
+  if (t.altTitles.length > 0) {
+    html += `<div class="alt-titles">Also known as: ${t.altTitles.map(esc).join(', ')}</div>`;
+  }
+  if (t.otherTunes.length > 0) {
+    html += `<div class="alt-titles">Also on this page: ${t.otherTunes.map(esc).join(', ')}</div>`;
+  }
+
+  a.innerHTML = html;
+  return a;
+}
+
+// ===================== BROWSE MODE =====================
+let BROWSE_DATA = null;
+let browseLoaded = false;
+let currentBook = null;  // { collectionName, bookName, pages: [...] }
+let currentPageIndex = 0;
+
+async function initBrowse() {
+  if (browseLoaded) return;
+  browseLoaded = true;
+
+  try {
+    const resp = await fetch('browse.json');
+    BROWSE_DATA = await resp.json();
+    renderCollectionList();
+  } catch (e) {
+    document.getElementById('collection-list').innerHTML =
+      '<div style="padding:1rem;color:#999;">Failed to load browse data.</div>';
+  }
+}
+
+function renderCollectionList() {
+  const container = document.getElementById('collection-list');
+  container.innerHTML = '';
+
+  for (const coll of BROWSE_DATA.collections) {
+    const item = document.createElement('div');
+    item.className = 'collection-item';
+
+    const toggle = document.createElement('button');
+    toggle.className = 'collection-toggle';
+    toggle.innerHTML = `<span class="arrow">&#9654;</span><span class="coll-name" title="${esc(coll.name)}">${esc(coll.short_name)}</span><span class="book-count">${coll.books.length}</span>`;
+
+    const bookList = document.createElement('div');
+    bookList.className = 'book-list';
+
+    for (const book of coll.books) {
+      const bookBtn = document.createElement('button');
+      bookBtn.className = 'book-item';
+      bookBtn.innerHTML = `${esc(book.name)} <span class="page-count">(${book.pages.length} pp)</span>`;
+      bookBtn.addEventListener('click', () => {
+        selectBook(coll, book, bookBtn);
+      });
+      bookList.appendChild(bookBtn);
+    }
+
+    toggle.addEventListener('click', () => {
+      toggle.classList.toggle('open');
+      bookList.classList.toggle('open');
+    });
+
+    item.appendChild(toggle);
+    item.appendChild(bookList);
+    container.appendChild(item);
+  }
+}
+
+function selectBook(coll, book, btnElement) {
+  // Update sidebar selection
+  document.querySelectorAll('.book-item.active').forEach(el => el.classList.remove('active'));
+  if (btnElement) btnElement.classList.add('active');
+
+  currentBook = {
+    collectionName: coll.short_name,
+    collectionFullName: coll.name,
+    bookName: book.name,
+    pages: book.pages
+  };
+  currentPageIndex = 0;
+
+  showBookPage();
+}
+
+function showBookPage() {
+  if (!currentBook || currentBook.pages.length === 0) return;
+
+  const toolbar = document.getElementById('viewer-toolbar');
+  const tuneInfo = document.getElementById('viewer-tune-info');
+  const pdfContainer = document.getElementById('viewer-pdf-container');
+
+  toolbar.style.display = 'flex';
+  tuneInfo.style.display = 'block';
+
+  // Update title
+  document.getElementById('viewer-book-title').textContent =
+    `${currentBook.collectionName} \u2014 ${currentBook.bookName}`;
+
+  // Update page indicator
+  document.getElementById('page-indicator').textContent =
+    `${currentPageIndex + 1} / ${currentBook.pages.length}`;
+
+  // Update nav buttons
+  document.getElementById('btn-prev').disabled = (currentPageIndex === 0);
+  document.getElementById('btn-next').disabled = (currentPageIndex >= currentBook.pages.length - 1);
+
+  // Update tune info
+  const page = currentBook.pages[currentPageIndex];
+  if (page.tunes && page.tunes.length > 0) {
+    tuneInfo.innerHTML =
+      `<span class="tune-label">Tunes: </span><span class="tune-names">${page.tunes.map(esc).join(' / ')}</span>`;
+  } else {
+    // Extract a display name from the filename
+    const fname = page.file.split('/').pop().replace('.pdf', '');
+    tuneInfo.innerHTML =
+      `<span class="tune-label">Page: </span><span class="tune-names">${esc(fname)}</span>`;
+  }
+
+  // Update PDF embed
+  const pdfUrl = 'ceolsean.net/' + page.file;
+  pdfContainer.innerHTML = `<embed src="${encodeURI(pdfUrl)}" type="application/pdf">`;
+}
+
+function navigatePage(delta) {
+  if (!currentBook) return;
+  const newIndex = currentPageIndex + delta;
+  if (newIndex < 0 || newIndex >= currentBook.pages.length) return;
+  currentPageIndex = newIndex;
+  showBookPage();
+}
+
+// ===================== MODE SWITCHING =====================
+let currentMode = 'search';
+
+function setMode(mode) {
+  currentMode = mode;
+
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.mode === mode);
+  });
+
+  const searchView = document.getElementById('search-view');
+  const browseView = document.getElementById('browse-view');
+
+  if (mode === 'search') {
+    searchView.classList.add('active');
+    browseView.classList.remove('active');
+    document.getElementById('search').focus();
+  } else {
+    searchView.classList.remove('active');
+    browseView.classList.add('active');
+    initBrowse();
+  }
+}
+
+// ===================== EVENT LISTENERS =====================
+document.querySelectorAll('.mode-tab').forEach(tab => {
+  tab.addEventListener('click', () => setMode(tab.dataset.mode));
+});
+
+document.getElementById('btn-prev').addEventListener('click', () => navigatePage(-1));
+document.getElementById('btn-next').addEventListener('click', () => navigatePage(1));
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (currentMode !== 'browse') return;
+  // Don't intercept if user is in an input field
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    navigatePage(-1);
+  } else if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    navigatePage(1);
+  }
+});
+
+// Sidebar resize
+(function() {
+  const handle = document.getElementById('resize-handle');
+  const sidebar = document.getElementById('browse-sidebar');
+  let dragging = false;
+  let startX, startWidth;
+
+  handle.addEventListener('mousedown', (e) => {
+    dragging = true;
+    startX = e.clientX;
+    startWidth = sidebar.offsetWidth;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const newWidth = Math.max(180, Math.min(500, startWidth + (e.clientX - startX)));
+    sidebar.style.width = newWidth + 'px';
+    sidebar.style.minWidth = newWidth + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+})();
+
+// ===================== UTILITIES =====================
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function debounce(fn, ms) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
+}
+
+// ===================== INIT =====================
+setMode('search');
+init();
+</script>
+
+</body>
+</html>
