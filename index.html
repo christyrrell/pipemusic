@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ceol Sean Pipe Music Library</title>
+<title>Pipe Music Library</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -478,7 +478,7 @@ header p {
 <body>
 
 <header>
-  <h1>Ceol Sean Pipe Music Library</h1>
+  <h1>Pipe Music Library</h1>
   <p>Search over 7,000 settings across 39 collections</p>
   <div class="mode-tabs">
     <button class="mode-tab active" data-mode="search">Search</button>
@@ -526,6 +526,8 @@ header p {
   </div>
 </div>
 
+<script src="index_data.js"></script>
+<script src="browse_data.js"></script>
 <script>
 // ===================== SEARCH MODE =====================
 let INDEX = [];
@@ -533,8 +535,7 @@ let FLAT = [];
 let PAGE_SIZE = 100;
 
 async function init() {
-  const resp = await fetch('index.json');
-  INDEX = await resp.json();
+  INDEX = INDEX_DATA;
 
   for (const entry of INDEX) {
     for (const tune of entry.tunes) {
@@ -720,14 +721,8 @@ async function initBrowse() {
   if (browseLoaded) return;
   browseLoaded = true;
 
-  try {
-    const resp = await fetch('browse.json');
-    BROWSE_DATA = await resp.json();
-    renderCollectionList();
-  } catch (e) {
-    document.getElementById('collection-list').innerHTML =
-      '<div style="padding:1rem;color:#999;">Failed to load browse data.</div>';
-  }
+  BROWSE_DATA = BROWSE_DATA_RAW;
+  renderCollectionList();
 }
 
 function renderCollectionList() {
